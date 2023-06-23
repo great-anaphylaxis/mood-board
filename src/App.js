@@ -1,25 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
 
-export default App;
+
+
+
+
+let testData = {
+    title: "HELP!",
+    date: "1/12/2009 - 12:00AM",
+    content: "I NEED HELP!"
+};
+
+export const Post = function(props) {
+    let data = props.data;
+
+    return (
+        <div className="post">
+            <h1 className="title">{data.title}</h1>
+            <h2 className="date">{data.date}</h2>
+            <p className="content">{data.content}</p>
+        </div>
+    );
+};
+
+export const Content = function() {
+    return (
+        <div id="content">
+            <Post data={testData}/>
+        </div>
+    );
+};
