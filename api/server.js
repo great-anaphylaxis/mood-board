@@ -40,11 +40,14 @@ function clientRequestErrorWall(res, bool, code = 400, message = "") {
     if (bool == true) {
         // send the message, with a code, as a response to the request
         res.status(code).send(message);
+
+        // return true
+        return true;
     }
 
     // if not
     else {
-        return;
+        return false;
     }
 }
 
@@ -56,7 +59,12 @@ function serverErrorWall(err, message = "Bro got an error!") {
         console.error("\n\n" + message + "\n\n", err);
 
         // kill server ? is this actually necessary ???
-        process.exit(-1);
+        // after many hours of thought, this is probably not necessary
+        // source: bro trust me
+        //process.exit(-1);
+
+        // return true
+        return true;
     }
 
     // if not
@@ -68,11 +76,11 @@ function serverErrorWall(err, message = "Bro got an error!") {
 
 
 // a function that queries the database, ez
-function query(queryParam1, queryParam2 = undefined, callback = () => {}) {
+function query(queryParam1, queryParam2 = undefined, callback = ()=>{}) {
     // attempt to connect the pool of database connections
     pool.connect((err, dbClient) => {
         // protek from error
-        serverErrorWall(err);
+        if (serverErrorWall(err)) { return; }
 
         // "execute" a query to database (I guess?)
         pool.query(queryParam1, queryParam2, (err, client) => {
@@ -96,7 +104,7 @@ function hashPassword(password, callback) {
     // yeah, hash it
     bcrypt.hash(password, 10, (err, hash) => {
         // error nope
-        serverErrorWall(err);
+        if (serverErrorWall(err)) { return; }
 
         // return to the callback function the hashed string
         callback(hash);
@@ -108,10 +116,28 @@ function comparePassword(attempt_password, hash_password, callback) {
     // (do i even need to comment the definition of this javascript statement?)
     bcrypt.compare(attempt_password, hash_password, (err, res) => {
         // if error, which is not gonna happen (pleaseee)
-        serverErrorWall(err);
+        if (serverErrorWall(err)) { return; }
 
         // i mean, you know what this means right?
         callback(res);
+    });
+}
+
+// check if username exists in the database
+function usernameExists(username, callback = ()=>{}) {
+    // search the database for the username
+    query("select * from public.users where username = $1", [username], res => {
+        // if the response is empty
+        if (!res[0]) {
+            // the username does not exist, false
+            callback(false);
+        }
+
+        // if there is a response
+        else if (res[0].username == username) {
+            // the username does exist, true
+            callback(true);
+        }
     });
 }
 
@@ -125,7 +151,7 @@ function comparePassword(attempt_password, hash_password, callback) {
 // error when connecting to pool
 pool.on('error', (err, client) => {
     // yeah, error if error
-    serverErrorWall(err);
+    if (serverErrorWall(err)) { return; }
 });
 
 
@@ -139,7 +165,7 @@ app.get('/api', (req, res) => {
 // create user
 app.post('/api/createuser', (req, res) => {
     // if the body is empty, then send error
-    clientRequestErrorWall(res, !req.body, 400);
+    if (clientRequestErrorWall(res, !req.body)) { return; }
 
     // the username from the request
     let username = req.body.username;
@@ -147,15 +173,23 @@ app.post('/api/createuser', (req, res) => {
     let raw_password = req.body.password;
 
     // if username or password is empty, then send error
-    clientRequestErrorWall(res, !username || !raw_password, 400);
+    if (clientRequestErrorWall(res, !username || !raw_password, 400)) { return; }
 
-    // hash the unsafe password
-    hashPassword(raw_password, (password) => {
-        // add the user
-        query("insert into public.users(username, password) values($1, $2)", [username, password]);
+    // check if username exists
+    query("select * from public.users where username = $1", [username], DBRes => {
+        // if username exists, then send error to client
+        // BUG
+        if (clientRequestErrorWall(res, (DBRes[0] != undefined))) { return; }
 
-        // send this response, to indicate successful request
-        res.status(201).send("Finished!");
+        // if not...
+        // hash the unsafe password
+        hashPassword(raw_password, (password) => {
+            // add the user
+            query("insert into public.users(username, password) values($1, $2)", [username, password]);
+
+            // send this response, to indicate successful request
+            res.status(201).send("Finished!");
+        });
     });
 });
 
@@ -163,7 +197,7 @@ app.post('/api/createuser', (req, res) => {
 // check if correct, then log in
 app.get('/api/login', (req, res) => {
     // if the body is empty, then send error
-    clientRequestErrorWall(res, !req.body, 400);
+    if (clientRequestErrorWall(res, !req.body)) { return; }
 
     // the username from the request
     let username = req.body.username;
@@ -171,10 +205,13 @@ app.get('/api/login', (req, res) => {
     let password = req.body.password;
 
     // if username or password is empty, then send error
-    clientRequestErrorWall(res, !username || !password, 400);
+    if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
 
     // get the username information from the database
     query("select * from public.users where username = $1", [username], DBRes => {
+        // if username DOES NOT exist, then send error to client
+        if (clientRequestErrorWall(res, !DBRes[0])) { return; }
+
         // get the username hashed password
         let hash_password = DBRes[0].password;
 
@@ -212,3 +249,5 @@ app.listen(port, () => {
 query("select * from public.users where id = 0", undefined, res => {
     console.log(res);
 });
+
+usernameExists("admin");
