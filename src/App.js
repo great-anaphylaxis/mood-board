@@ -3,13 +3,23 @@ import { renderContent } from ".";
 let postDataArray = [];
 
 
+// request the backend to provide you posts
 function getPosts() {
+    // fetch the backend
     fetch("/api/getposts")
+    // turn to json
     .then(res => res.json())
+    // set the post data array
     .then(res => postDataArray = res)
+    // render the posts
     .then(() => renderContent(postDataArray));
 }
 
+// yeah, exactly what the function says
+function convertDateToLocalDate(date) {
+    // yeah
+    return new Date(date).toLocaleString("en-US", {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone});
+}
 
 
 
@@ -27,7 +37,7 @@ export const Post = function(props) {
         <div className="post">
             <h1 className="title">{data.title}</h1>
             <h2 className="from">From: {data.from}</h2>
-            <h2 className="date">Date: {new Date(data.date).toLocaleString("en-US", {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone})}</h2>
+            <h2 className="date">Date: {convertDateToLocalDate(data.date)}</h2>
             <hr className="divider"></hr>
             <pre className="content">{data.content}</pre>
         </div>
@@ -51,5 +61,6 @@ export const Content = function() {
         </div>
     );
 };
+
 
 getPosts();

@@ -230,7 +230,7 @@ app.post('/api/createuser', (req, res) => {
 // when /api/login is called
 // check if correct, then log in
 // needs user info
-app.get('/api/login', (req, res) => {
+app.post('/api/login', (req, res) => {
     // if the body is empty, then send error
     if (clientRequestErrorWall(res, !req.body)) { return; }
 
@@ -238,7 +238,7 @@ app.get('/api/login', (req, res) => {
     let username = req.body.username;
     // the password from the request
     let password = req.body.password;
-
+    
     // if username or password is empty, then send error
     if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
 

@@ -2,15 +2,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './App.css';
-import { Navbar, Content, Post } from './App.js';
+import { Navbar, Content, Post } from './App';
 import { servePageAccordingly, addPage } from './singlepage';
+import { LoginForm } from './account';
 
 
 addPage('/', <>
     <Navbar /><Content />
 </>);
 
-
+addPage('/login', <>
+    <LoginForm />
+</>);
 
 
 

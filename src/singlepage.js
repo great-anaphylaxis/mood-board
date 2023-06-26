@@ -1,3 +1,4 @@
+// import, because yeah
 import React from "react";
 
 // where the pages are stored
