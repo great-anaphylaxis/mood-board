@@ -1,4 +1,3 @@
-
 //scratch pad for bugs
 
 // sanitize input, like length, special characters, etc...
@@ -38,16 +37,41 @@ const pool = new pg.Pool({
 
 
 
+// messages
+// error messages
+const ERROR_MESSAGE = {
+    UNKNOWN: "Something unknown happened",
+    USERNAME_DOES_NOT_EXIST: "Username does not exist",
+    EMPTY_BODY: "Body is empty",
+    INCOMPLETE_BODY: "Body is incomplete",
+    USERNAME_ALREADY_EXISTS: "Username already exists",
+    LOGIN_FAILED: "Login failed: username and password do not match",
+    NO_POST_INFORMATION: "No post information available",
+    INCOMPLETE_POST: "Post information is incomplete",
+    INVALID_CREDENTIALS: "Invalid credentials, please log in again",
+};
+
+// success messages
+const SUCCESS_MESSAGE = {
+    DEFAULT: "Success",
+    API_LANDING: "Welcome to moodboard's /api",
+    USER_CREATED: "New user created",
+    LOGIN_SUCCESS: "Login successful",
+    POST_CREATED: "New post created",
+};
+
+
+
 
 
 
 // all these functions are not really a "wall", made just to reduce my functions' "size"
 // if the client messed up or tried to hack your app but instead did it incorrectly
-function clientRequestErrorWall(res, bool, code = 400, message = "") {
+function clientRequestErrorWall(res, bool, code = 400, message = ERROR_MESSAGE.UNKNOWN) {
     // if bool is true (a condition probably)
     if (bool == true) {
         // send the message, with a code, as a response to the request
-        res.status(code).send(message);
+        res.status(code).send(responseReadyMessage(message, -1));
 
         // return true
         return true;
@@ -79,6 +103,22 @@ function serverErrorWall(err, message = "Bro got an error!") {
     else {
         return false;
     }
+}
+
+// like the clientRequestErrorWall, but the exact opposite
+function clientRequestSuccessWall(res, code = 200, message = SUCCESS_MESSAGE.DEFAULT) {
+    // respond to request
+    res.status(code).send(responseReadyMessage(message, 1));
+}
+
+// a function that return a response to a request
+// and.... that response is "translated" for the client
+function responseReadyMessage(message, status) {
+    // yeah, jsonify the stuff
+    return JSON.stringify({
+        status: status,
+        message: message
+    });
 }
 
 
@@ -150,19 +190,12 @@ function usernameExists(username, callback = ()=>{}) {
     });
 }
 
-// a function that returns a (specified) user in a JSON string
-function userInJSON(username, password) {
-    return JSON.stringify({
-        username: username,
-        password: password
-    });
-}
-
+// a function which checks the integrity of the user
 function checkUserInfoForValidity(res, username, password, callback = ()=>{}) {
     // get the username information from the database
     query("select * from public.users where username = $1", [username], DBRes => {
         // if username DOES NOT exist, then send error to client
-        if (clientRequestErrorWall(res, !DBRes[0])) { return; }
+        if (clientRequestErrorWall(res, !DBRes[0], 403, ERROR_MESSAGE.USERNAME_DOES_NOT_EXIST)) { return; }
 
         // get the username hashed password
         let hash_password = DBRes[0].password;
@@ -191,7 +224,7 @@ pool.on('error', (err, client) => {
 // when /api is requested
 app.get('/api', (req, res) => {
     // send this thing
-    res.status(200).send("Here is what the server returns");
+    clientRequestSuccessWall(res, 200, SUCCESS_MESSAGE.API_LANDING);
 });
 
 // when /api/createuser is called
@@ -199,7 +232,7 @@ app.get('/api', (req, res) => {
 // needs user info
 app.post('/api/createuser', (req, res) => {
     // if the body is empty, then send error
-    if (clientRequestErrorWall(res, !req.body)) { return; }
+    if (clientRequestErrorWall(res, !req.body, 400, ERROR_MESSAGE.EMPTY_BODY)) { return; }
 
     // the username from the request
     let username = req.body.username;
@@ -207,13 +240,12 @@ app.post('/api/createuser', (req, res) => {
     let raw_password = req.body.password;
 
     // if username or password is empty, then send error
-    if (clientRequestErrorWall(res, !username || !raw_password, 400)) { return; }
+    if (clientRequestErrorWall(res, !username || !raw_password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
 
     // check if username exists
     query("select * from public.users where username = $1", [username], DBRes => {
         // if username exists, then send error to client
-        // BUG
-        if (clientRequestErrorWall(res, (DBRes[0] != undefined))) { return; }
+        if (clientRequestErrorWall(res, (DBRes[0] != undefined), 400, ERROR_MESSAGE.USERNAME_ALREADY_EXISTS)) { return; }
 
         // if not...
         // hash the unsafe password
@@ -221,8 +253,8 @@ app.post('/api/createuser', (req, res) => {
             // add the user
             query("insert into public.users(username, password) values($1, $2)", [username, password]);
 
-            // send user as response, to indicate successful request
-            res.status(201).send(userInJSON(username, raw_password));
+            // send successful response
+            clientRequestSuccessWall(res, 201, SUCCESS_MESSAGE.USER_CREATED);
         });
     });
 });
@@ -232,7 +264,7 @@ app.post('/api/createuser', (req, res) => {
 // needs user info
 app.post('/api/login', (req, res) => {
     // if the body is empty, then send error
-    if (clientRequestErrorWall(res, !req.body)) { return; }
+    if (clientRequestErrorWall(res, !req.body, 400, ERROR_MESSAGE.EMPTY_BODY)) { return; }
 
     // the username from the request
     let username = req.body.username;
@@ -240,20 +272,20 @@ app.post('/api/login', (req, res) => {
     let password = req.body.password;
     
     // if username or password is empty, then send error
-    if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
+    if (clientRequestErrorWall(res, !username || !password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
 
     // check if username and password are correct and valid
     checkUserInfoForValidity(res, username, password, isValid => {
         // if the passwords do match
         if (isValid == true) {
             // send ok, and the user
-            res.status(200).send(userInJSON(username, password));
+            clientRequestSuccessWall(res, 200, SUCCESS_MESSAGE.LOGIN_SUCCESS);
         }
 
         // else if they did not
         else if (isValid == false) {
             // send not ok
-            res.status(403).send();
+            clientRequestErrorWall(res, true, 403, ERROR_MESSAGE.LOGIN_FAILED);
         }
     });
 });
@@ -273,7 +305,7 @@ app.get('/api/getposts', (req, res) => {
 // needs user info
 app.post('/api/createpost', (req, res) => {
     // if the body is empty, then send error
-    if (clientRequestErrorWall(res, !req.body)) { return; }
+    if (clientRequestErrorWall(res, !req.body, 400, ERROR_MESSAGE.EMPTY_BODY)) { return; }
 
     // the username from the request
     let username = req.body.username;
@@ -281,12 +313,12 @@ app.post('/api/createpost', (req, res) => {
     let password = req.body.password;
 
     // if username or password is empty, then send error
-    if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
+    if (clientRequestErrorWall(res, !username || !password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
 
     
 
     // if the post object is empty, then send error
-    if (clientRequestErrorWall(res, !req.body.post)) { return; }
+    if (clientRequestErrorWall(res, !req.body.post, 400, ERROR_MESSAGE.NO_POST_INFORMATION)) { return; }
 
     // the post title to be created
     let postTitle = req.body.post.title;
@@ -294,7 +326,7 @@ app.post('/api/createpost', (req, res) => {
     let postContent = req.body.post.content;
 
     // if post title or post content is empty, then send error
-    if (clientRequestErrorWall(res, !postTitle || !postContent, 400)) { return; }
+    if (clientRequestErrorWall(res, !postTitle || !postContent, 400, ERROR_MESSAGE.INCOMPLETE_POST)) { return; }
 
     
 
@@ -307,15 +339,15 @@ app.post('/api/createpost', (req, res) => {
             // add the post in the database
             query("insert into public.posts(title, \"from\", date, content) values($1, $2, $3, $4)",
             [postTitle, username, new Date().toUTCString(), postContent], () => {
-                // send user as response, to indicate successful request
-                res.status(201).send(userInJSON(username, password));
+                // successful request
+                clientRequestSuccessWall(res, 201, SUCCESS_MESSAGE.POST_CREATED);
             });
         }
 
         // else if they did not
         else if (isValid == false) {
             // send not ok
-            res.status(403).send();
+            clientRequestErrorWall(res, true, 403, ERROR_MESSAGE.INVALID_CREDENTIALS);
         }
     });
 });
