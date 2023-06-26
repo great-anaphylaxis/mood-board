@@ -1,9 +1,34 @@
 
+:root {
+    --theme-color-main: rgb(0, 28, 48);
+    --theme-color-secondary: rgb(218, 255, 251);
+    --theme-color-tertiary: rgb(23, 107, 135);
+}
+
+body {
+    background-color: var(--theme-color-main);
+    color: var(--theme-color-secondary);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 .post {
-    border: 1px solid black;
+    border: 1px solid var(--theme-color-tertiary);
     width: fit-content;
+    min-width: 60%;
+    max-width: 60%;
     padding: 1em;
-    margin: 0em auto;
+    margin: 2em auto;
 }
 
 .title {
@@ -18,6 +43,7 @@
 
 .divider {
     margin: 0;
+    border-color: var(--theme-color-tertiary);
 }
 
 .content {
