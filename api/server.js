@@ -306,7 +306,7 @@ app.post('/api/createpost', (req, res) => {
             
             // add the post in the database
             query("insert into public.posts(title, \"from\", date, content) values($1, $2, $3, $4)",
-            [postTitle, username, "idk yet: TODO", postContent], () => {
+            [postTitle, username, new Date().toUTCString(), postContent], () => {
                 // send user as response, to indicate successful request
                 res.status(201).send(userInJSON(username, password));
             });

@@ -27,7 +27,7 @@ export const Post = function(props) {
         <div className="post">
             <h1 className="title">{data.title}</h1>
             <h2 className="from">From: {data.from}</h2>
-            <h2 className="date">Date: {data.date}</h2>
+            <h2 className="date">Date: {new Date(data.date).toLocaleString("en-US", {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone})}</h2>
             <hr className="divider"></hr>
             <pre className="content">{data.content}</pre>
         </div>
