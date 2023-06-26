@@ -1,13 +1,14 @@
+import { renderContent } from ".";
+
+let postDataArray = [];
 
 
-let testData = {
-    title: "HELP!",
-    date: "1/12/2009 - 12:00AM",
-    content: "I NEED HELP!"
-};
-
-
-
+function getPosts() {
+    fetch("/api/getposts")
+    .then(res => res.json())
+    .then(res => postDataArray = res)
+    .then(() => renderContent(postDataArray));
+}
 
 
 
@@ -25,8 +26,10 @@ export const Post = function(props) {
     return (
         <div className="post">
             <h1 className="title">{data.title}</h1>
-            <h2 className="date">{data.date}</h2>
-            <p className="content">{data.content}</p>
+            <h2 className="from">From: {data.from}</h2>
+            <h2 className="date">Date: {data.date}</h2>
+            <hr className="divider"></hr>
+            <pre className="content">{data.content}</pre>
         </div>
     );
 };
@@ -44,7 +47,9 @@ export const Content = function() {
     // the Content component
     return (
         <div id="content">
-            <Post data={testData}/>
+            {postDataArray.map((post) => <Post data={post} />)}
         </div>
     );
 };
+
+getPosts();

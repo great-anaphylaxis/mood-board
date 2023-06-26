@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './App.css';
-import { Navbar, Content } from './App.js';
+import { Navbar, Content, Post } from './App.js';
 
 // the root element 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -14,3 +14,11 @@ root.render(
         <Content />
     </React.StrictMode>
 );
+
+export const renderContent = (content) => {
+    ReactDOM.createRoot(document.getElementById('content')).render(
+        <React.StrictMode>
+            {content.map((post, i) => <Post key={i} data={post} />)}
+        </React.StrictMode>
+    );
+};

@@ -1,4 +1,11 @@
 
+//scratch pad for bugs
+
+// sanitize input, like length, special characters, etc...
+
+//end
+
+
 // le modules, or packages, or idk
 // express
 const express = require('express');
@@ -6,6 +13,7 @@ const express = require('express');
 const pg = require('pg');
 // bcrypt
 const bcrypt = require('bcrypt');
+const { json } = require('express');
 
 
 
@@ -75,6 +83,7 @@ function serverErrorWall(err, message = "Bro got an error!") {
 
 
 
+
 // a function that queries the database, ez
 function query(queryParam1, queryParam2 = undefined, callback = ()=>{}) {
     // attempt to connect the pool of database connections
@@ -141,6 +150,30 @@ function usernameExists(username, callback = ()=>{}) {
     });
 }
 
+// a function that returns a (specified) user in a JSON string
+function userInJSON(username, password) {
+    return JSON.stringify({
+        username: username,
+        password: password
+    });
+}
+
+function checkUserInfoForValidity(res, username, password, callback = ()=>{}) {
+    // get the username information from the database
+    query("select * from public.users where username = $1", [username], DBRes => {
+        // if username DOES NOT exist, then send error to client
+        if (clientRequestErrorWall(res, !DBRes[0])) { return; }
+
+        // get the username hashed password
+        let hash_password = DBRes[0].password;
+
+        // compare the passwords if they match
+        comparePassword(password, hash_password, isValid => {
+            callback(isValid);
+        });
+    });
+}
+
 
 
 
@@ -163,6 +196,7 @@ app.get('/api', (req, res) => {
 
 // when /api/createuser is called
 // create user
+// needs user info
 app.post('/api/createuser', (req, res) => {
     // if the body is empty, then send error
     if (clientRequestErrorWall(res, !req.body)) { return; }
@@ -187,14 +221,15 @@ app.post('/api/createuser', (req, res) => {
             // add the user
             query("insert into public.users(username, password) values($1, $2)", [username, password]);
 
-            // send this response, to indicate successful request
-            res.status(201).send("Finished!");
+            // send user as response, to indicate successful request
+            res.status(201).send(userInJSON(username, raw_password));
         });
     });
 });
 
 // when /api/login is called
 // check if correct, then log in
+// needs user info
 app.get('/api/login', (req, res) => {
     // if the body is empty, then send error
     if (clientRequestErrorWall(res, !req.body)) { return; }
@@ -207,31 +242,83 @@ app.get('/api/login', (req, res) => {
     // if username or password is empty, then send error
     if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
 
-    // get the username information from the database
-    query("select * from public.users where username = $1", [username], DBRes => {
-        // if username DOES NOT exist, then send error to client
-        if (clientRequestErrorWall(res, !DBRes[0])) { return; }
+    // check if username and password are correct and valid
+    checkUserInfoForValidity(res, username, password, isValid => {
+        // if the passwords do match
+        if (isValid == true) {
+            // send ok, and the user
+            res.status(200).send(userInJSON(username, password));
+        }
 
-        // get the username hashed password
-        let hash_password = DBRes[0].password;
-
-        // compare the passwords if they match
-        comparePassword(password, hash_password, isValid => {
-            // if the passwords do match
-            if (isValid == true) {
-                // send ok
-                res.status(200).send();
-            }
-
-            // else if they did not
-            else if (isValid == false) {
-                // send not ok
-                res.status(403).send();
-            }
-        });
+        // else if they did not
+        else if (isValid == false) {
+            // send not ok
+            res.status(403).send();
+        }
     });
 });
 
+// when /api/getposts is called
+// get posts from the database
+app.get('/api/getposts', (req, res) => {
+    // query ALL the posts, without any algorithm whatsoever
+    query("select * from public.posts", undefined, DBRes => {
+        // send ALL the posts :D
+        res.status(200).send(JSON.stringify(DBRes));
+    })
+});
+
+// when /api/createpost is called
+// create a new post
+// needs user info
+app.post('/api/createpost', (req, res) => {
+    // if the body is empty, then send error
+    if (clientRequestErrorWall(res, !req.body)) { return; }
+
+    // the username from the request
+    let username = req.body.username;
+    // the password from the request
+    let password = req.body.password;
+
+    // if username or password is empty, then send error
+    if (clientRequestErrorWall(res, !username || !password, 400)) { return; }
+
+    
+
+    // if the post object is empty, then send error
+    if (clientRequestErrorWall(res, !req.body.post)) { return; }
+
+    // the post title to be created
+    let postTitle = req.body.post.title;
+    // the post content to be created
+    let postContent = req.body.post.content;
+
+    // if post title or post content is empty, then send error
+    if (clientRequestErrorWall(res, !postTitle || !postContent, 400)) { return; }
+
+    
+
+    // check if username and password are correct and valid
+    // this is to prevent "malicious" posting of something
+    checkUserInfoForValidity(res, username, password, isValid => {
+        // if the passwords do match
+        if (isValid == true) {
+            
+            // add the post in the database
+            query("insert into public.posts(title, \"from\", date, content) values($1, $2, $3, $4)",
+            [postTitle, username, "idk yet: TODO", postContent], () => {
+                // send user as response, to indicate successful request
+                res.status(201).send(userInJSON(username, password));
+            });
+        }
+
+        // else if they did not
+        else if (isValid == false) {
+            // send not ok
+            res.status(403).send();
+        }
+    });
+});
 
 
 
