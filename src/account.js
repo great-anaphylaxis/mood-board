@@ -1,4 +1,5 @@
-
+// useful stuff
+import CryptoJS from "crypto-js";
 
 
 
@@ -17,9 +18,20 @@ function isAccountRequestSuccessful(res) {
     }
 }
 
+function encryptCredentials(username, password) {
+    let jsonString = JSON.stringify({
+        username: username,
+        password: password
+    });
 
+    
 
+    let credential
 
+    console.log(credential);
+}
+
+encryptCredentials("a", "a");
 
 
 
@@ -45,7 +57,7 @@ function login(username, password) {
 
         // if not so successful response :(
         else {
-            console.error("ERROR! " + response.message);
+            console.log("ERROR! " + response.message);
         }
     });
 }

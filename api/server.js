@@ -12,7 +12,6 @@ const express = require('express');
 const pg = require('pg');
 // bcrypt
 const bcrypt = require('bcrypt');
-const { json } = require('express');
 
 
 
@@ -37,6 +36,14 @@ const pool = new pg.Pool({
 
 
 
+// numbers
+const NUM = {
+    MIN_USERNAME_LENGTH: 3,
+    MAX_USERNAME_LENGTH: 20,
+    MIN_PASSWORD_LENGTH: 5,
+    MAX_PASSWORD_LENGTH: 32
+};
+
 // messages
 // error messages
 const ERROR_MESSAGE = {
@@ -49,6 +56,8 @@ const ERROR_MESSAGE = {
     NO_POST_INFORMATION: "No post information available",
     INCOMPLETE_POST: "Post information is incomplete",
     INVALID_CREDENTIALS: "Invalid credentials, please log in again",
+    INVALID_USERNAME: "Invalid username, length not allowed or contains invalid characters",
+    INVALID_PASSWORD: "Invalid password, length not allowed or contains invalid characters"
 };
 
 // success messages
@@ -122,7 +131,92 @@ function responseReadyMessage(message, status) {
 }
 
 
+// a function which validates the username string if it is valid
+function usernameStringValidityWall(username) {
+    // has letter
+    let hasLetter = false;
 
+    // check if length is valid
+    if (username.length <= NUM.MAX_USERNAME_LENGTH && username.length >= NUM.MIN_USERNAME_LENGTH) {
+        // loop through characters
+        for (let i = 0; i < username.length; i++) {
+            // the char code of the character
+            let char = username.charCodeAt(i);
+
+            // 0 to 9
+            if (char >= 48 && char <= 57) {
+                continue;
+            }
+
+            // A to Z
+            else if (char >= 65 && char <= 90) {
+                hasLetter = true;
+                continue;
+            }
+
+            // a to z
+            else if (char >= 97 && char <= 122) {
+                hasLetter = true;
+                continue;
+            }
+
+            // - | . | _
+            else if (char == 45 || char == 46 || char == 95) {
+                continue;
+            }
+
+            // character is invalid
+            else {
+                return false;
+            }
+        }
+    }
+
+    // length not valid
+    else {
+        return false;
+    }
+
+    // check if there has been a letter found
+    if (hasLetter == true) {
+        return true;
+    }
+    
+    // if there is none
+    else {
+        return false;
+    }
+}
+
+// a function which validates the password string if it is valid
+function passwordStringValidityWall(password) {
+    // check if length is valid
+    if (password.length <= NUM.MAX_PASSWORD_LENGTH && password.length >= NUM.MIN_PASSWORD_LENGTH) {
+        // loop through characters
+        for (let i = 0; i < password.length; i++) {
+            // the char code of the character
+            let char = password.charCodeAt(i);
+
+            // 0 to 9, A to Z, a to z, symbols and space
+            if (char >= 32 && char <= 126) {
+                continue;
+            }
+
+            // character is invalid
+            else {
+                return false;
+            }
+        }
+    }
+
+    // length not valid
+    else {
+        return false;
+    }
+
+    // string is valid
+    return true;
+}
 
 // a function that queries the database, ez
 function query(queryParam1, queryParam2 = undefined, callback = ()=>{}) {
@@ -242,6 +336,11 @@ app.post('/api/createuser', (req, res) => {
     // if username or password is empty, then send error
     if (clientRequestErrorWall(res, !username || !raw_password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
 
+    // check if username is valid
+    if (clientRequestErrorWall(res, !usernameStringValidityWall(username), 400, ERROR_MESSAGE.INVALID_USERNAME)) { return; }
+    // check if password is valid
+    if (clientRequestErrorWall(res, !passwordStringValidityWall(raw_password), 400, ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
+
     // check if username exists
     query("select * from public.users where username = $1", [username], DBRes => {
         // if username exists, then send error to client
@@ -273,6 +372,11 @@ app.post('/api/login', (req, res) => {
     
     // if username or password is empty, then send error
     if (clientRequestErrorWall(res, !username || !password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
+
+    // check if username is valid
+    if (clientRequestErrorWall(res, !usernameStringValidityWall(username), 400, ERROR_MESSAGE.INVALID_USERNAME)) { return; }
+    // check if password is valid
+    if (clientRequestErrorWall(res, !passwordStringValidityWall(password), 400, ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
 
     // check if username and password are correct and valid
     checkUserInfoForValidity(res, username, password, isValid => {
@@ -315,7 +419,10 @@ app.post('/api/createpost', (req, res) => {
     // if username or password is empty, then send error
     if (clientRequestErrorWall(res, !username || !password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
 
-    
+    // check if username is valid
+    if (clientRequestErrorWall(res, !usernameStringValidityWall(username), 400, ERROR_MESSAGE.INVALID_USERNAME)) { return; }
+    // check if password is valid
+    if (clientRequestErrorWall(res, !passwordStringValidityWall(password), 400, ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
 
     // if the post object is empty, then send error
     if (clientRequestErrorWall(res, !req.body.post, 400, ERROR_MESSAGE.NO_POST_INFORMATION)) { return; }
