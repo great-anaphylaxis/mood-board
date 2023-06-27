@@ -1,4 +1,4 @@
-
+import { renderContent } from ".";
 
 
 // just a function which "logs" a message
@@ -22,6 +22,12 @@ function saveCredentials(username, password) {
 
     // save to localStorage
     localStorage.setItem('credentials', json);
+}
+
+// get credentials, and if none, act accordingly (lol)
+// TODO
+function getCredentials() {
+    return localStorage.getItem('credentials');
 }
 
 
@@ -112,6 +118,20 @@ function signup(username, password) {
             logger("ERROR! " + response.message);
         }
     });
+}
+
+// get posts function
+export const getPosts = function() {
+    // fetch /api/login, with the necessary information
+    fetch("/api/getposts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: getCredentials()
+    })
+    // then convert response to json
+    .then(response => response.json())
+    // render the content
+    .then(response => renderContent(response));
 }
 
 

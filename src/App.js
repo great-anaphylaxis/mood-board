@@ -1,19 +1,4 @@
-import { renderContent } from ".";
-
-let postDataArray = [];
-
-
-// request the backend to provide you posts
-function getPosts() {
-    // fetch the backend
-    fetch("/api/getposts")
-    // turn to json
-    .then(res => res.json())
-    // set the post data array
-    .then(res => postDataArray = res)
-    // render the posts
-    .then(() => renderContent(postDataArray));
-}
+import { getPosts } from "./account";
 
 // yeah, exactly what the function says
 function convertDateToLocalDate(date) {
@@ -57,10 +42,9 @@ export const Content = function() {
     // the Content component
     return (
         <div id="content">
-            {postDataArray.map((post) => <Post data={post} />)}
+            
         </div>
     );
 };
-
 
 getPosts();

@@ -1,10 +1,3 @@
-//scratch pad for bugs
-
-// sanitize input, like length, special characters, etc...
-
-//end
-
-
 // le modules, or packages, or idk
 // express
 const express = require('express');
@@ -396,12 +389,44 @@ app.post('/api/login', (req, res) => {
 
 // when /api/getposts is called
 // get posts from the database
-app.get('/api/getposts', (req, res) => {
-    // query ALL the posts, without any algorithm whatsoever
-    query("select * from public.posts", undefined, DBRes => {
-        // send ALL the posts :D
-        res.status(200).send(JSON.stringify(DBRes));
-    })
+// needs user info
+app.post('/api/getposts', (req, res) => {
+    // if the body is empty, then send error
+    if (clientRequestErrorWall(res, !req.body, 400, ERROR_MESSAGE.EMPTY_BODY)) { return; }
+
+    // the username from the request
+    let username = req.body.username;
+    // the password from the request
+    let password = req.body.password;
+
+    // if username or password is empty, then send error
+    if (clientRequestErrorWall(res, !username || !password, 400, ERROR_MESSAGE.INCOMPLETE_BODY)) { return; }
+
+    // check if username is valid
+    if (clientRequestErrorWall(res, !usernameStringValidityWall(username), 400, ERROR_MESSAGE.INVALID_USERNAME)) { return; }
+    // check if password is valid
+    if (clientRequestErrorWall(res, !passwordStringValidityWall(password), 400, ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
+
+
+    // check if username and password are correct and valid
+    // this is to prevent "malicious" posting of something
+    checkUserInfoForValidity(res, username, password, isValid => {
+        // if the passwords do match
+        if (isValid == true) {
+            
+            // query ALL the posts, without any algorithm whatsoever
+            query("select * from public.posts", undefined, DBRes => {
+                // send ALL the posts :D
+                res.status(200).send(JSON.stringify(DBRes));
+            });
+        }
+
+        // else if they did not
+        else if (isValid == false) {
+            // send not ok
+            clientRequestErrorWall(res, true, 403, ERROR_MESSAGE.INVALID_CREDENTIALS);
+        }
+    });
 });
 
 // when /api/createpost is called
