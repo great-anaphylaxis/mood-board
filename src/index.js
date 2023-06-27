@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './App.css';
 import { Navbar, Content, Post } from './App';
 import { servePageAccordingly, addPage } from './singlepage';
-import { LoginForm } from './account';
+import { LoginForm, SignupForm } from './account';
 
 
 addPage('/', <>
@@ -15,6 +15,9 @@ addPage('/login', <>
     <LoginForm />
 </>);
 
+addPage('/signup', <>
+    <SignupForm />
+</>);
 
 
 
