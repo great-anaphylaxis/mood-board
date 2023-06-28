@@ -72,13 +72,15 @@ window.addEventListener('load', () => {
     // validates the credentials when in main page
     if (window.location.pathname === '/') {
         // get posts when bro is good
-        serverValidateCredentials(res => {
+        serverValidateCredentials(() => {
             // get posts
             getPosts();
+        }, () => {
+            // bro is bad ???
+            // exile !!!
+            redirect("/login");
         });
 
-        // bro is bad ???
-        // exile !!!
-        redirect("/login");
+        
     }
 });

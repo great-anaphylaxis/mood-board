@@ -1,6 +1,9 @@
 import { renderContent } from ".";
 import { NUM } from ".";
 
+
+// BUG! callback sucks
+
 // client side walls
 // a function which validates the username string if it is valid
 function usernameStringValidityWall(username) {
@@ -212,7 +215,7 @@ function getCredentials() {
 
 
 // asks the server to validate the credentials
-export function serverValidateCredentials(callback = ()=>{}) {
+export function serverValidateCredentials(callbackTrue = ()=>{}, callbackFalse = ()=>{}) {
     // get the credentials
     let credentials = getCredentials();
 
@@ -222,15 +225,15 @@ export function serverValidateCredentials(callback = ()=>{}) {
     }
 
     // login, or in other words, ask the server for help to validate the credentials
-    login(credentials.username, credentials.password, res => {
+    login(credentials.username, credentials.password, res => {console.log(1);
         // login failed- i mean server disagrees
         if (!isAPIRequestSuccessful(res)) {
-            return;
+            callbackFalse();
         }
 
         // else
         else {
-            callback();
+            callbackTrue();
         }
     });
 }
