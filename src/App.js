@@ -1,5 +1,3 @@
-import { getPosts } from "./account";
-
 // yeah, exactly what the function says
 function convertDateToLocalDate(date) {
     // yeah
@@ -46,5 +44,3 @@ export const Content = function() {
         </div>
     );
 };
-
-getPosts();

@@ -60,6 +60,7 @@ const SUCCESS_MESSAGE = {
     USER_CREATED: "New user created",
     LOGIN_SUCCESS: "Login successful",
     POST_CREATED: "New post created",
+    GETPOST_SUCCESS: "Got posts successfully",
 };
 
 
@@ -417,7 +418,11 @@ app.post('/api/getposts', (req, res) => {
             // query ALL the posts, without any algorithm whatsoever
             query("select * from public.posts", undefined, DBRes => {
                 // send ALL the posts :D
-                res.status(200).send(JSON.stringify(DBRes));
+                res.status(200).send(JSON.stringify({
+                    status: 1,
+                    message: SUCCESS_MESSAGE.GETPOST_SUCCESS,
+                    data: DBRes
+                }));
             });
         }
 
