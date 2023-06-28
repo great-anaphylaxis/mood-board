@@ -7,6 +7,22 @@ import { servePageAccordingly, addPage } from './singlepage';
 import { LoginForm, SignupForm } from './account';
 
 
+// numbers
+export const NUM = {
+    MIN_USERNAME_LENGTH: 3,
+    MAX_USERNAME_LENGTH: 20,
+    MIN_PASSWORD_LENGTH: 5,
+    MAX_PASSWORD_LENGTH: 32,
+
+    GET_CREDENTIAL_ERROR: -1,
+
+    GET_FETCHBODY_ERROR: -1,
+};
+
+
+
+// pages
+
 addPage('/', <>
     <Navbar /><Content />
 </>);
@@ -18,6 +34,9 @@ addPage('/login', <>
 addPage('/signup', <>
     <SignupForm />
 </>);
+
+
+
 
 
 
