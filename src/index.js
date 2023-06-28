@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom/client';
 import './App.css';
 import { Navbar, Content, Post } from './App';
 import { servePageAccordingly, addPage } from './singlepage';
-import { LoginForm, SignupForm, redirect } from './account';
-import { getPosts, serverValidateCredentials } from './account';
+import { LoginForm, SignupForm, redirect, getPosts, serverValidateCredentials, isAPIRequestSuccessful } from './account';
 
 
 // numbers
@@ -71,16 +70,21 @@ export const renderContent = (content) => {
 window.addEventListener('load', () => {
     // validates the credentials when in main page
     if (window.location.pathname === '/') {
-        // get posts when bro is good
-        serverValidateCredentials(() => {
-            // get posts
-            getPosts();
-        }, () => {
-            // bro is bad ???
-            // exile !!!
-            redirect("/login");
-        });
+        serverValidateCredentials(res => {
+            // if it is good
+            if (isAPIRequestSuccessful(res)) {
+                // get posts
+                getPosts(res => {console.log(res)
+                    // render the post ssssssss
+                    renderContent(res);
+                });
+            }
 
-        
+            // if bros not good
+            else {
+                // exile !!!
+                redirect("/login");
+            }
+        });
     }
 });

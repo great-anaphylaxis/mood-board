@@ -1,4 +1,3 @@
-import { renderContent } from ".";
 import { NUM } from ".";
 
 
@@ -105,10 +104,16 @@ function logger(message) {
 }
 
 // a wall to prevent an error from continuing
-function clientErrorWall(bool, message = "ERROR!") {
+function clientErrorWall(callback, bool, message = "ERROR!") {
     // if bool (probably a condition) is true
     if (bool === true) {
-        // log the message
+        // "callback" the message
+        callback({
+            status: NUM.FAILED,
+            message: message
+        });
+
+        // also, yeah
         logger(message);
 
         // return true
@@ -199,50 +204,19 @@ function getCredentials() {
     }
 
     // if username or password is not "there", send error
-    if (clientErrorWall(!credentials.username || !credentials.password, "ERROR")) { return NUM.FAILED; }
+    if (!credentials.username || !credentials.password) { return NUM.FAILED; }
 
     // check username string if it is valid
-    if (clientErrorWall(!usernameStringValidityWall(credentials.username), "ERROR")) { return NUM.FAILED; }
+    if (!usernameStringValidityWall(credentials.username)) { return NUM.FAILED; }
     // check password string if it is valid
-    if (clientErrorWall(!passwordStringValidityWall(credentials.password), "ERROR")) { return NUM.FAILED; }
+    if (!passwordStringValidityWall(credentials.password)) { return NUM.FAILED; }
 
     // finally, return the credentials
     return credentials;
 }
 
-
-
-
-
-// asks the server to validate the credentials
-export function serverValidateCredentials(callbackTrue = ()=>{}, callbackFalse = ()=>{}) {
-    // get the credentials
-    let credentials = getCredentials();
-
-    // check if credentials are good
-    if (credentials === NUM.FAILED) {
-        return;
-    }
-
-    // login, or in other words, ask the server for help to validate the credentials
-    login(credentials.username, credentials.password, res => {console.log(1);
-        // login failed- i mean server disagrees
-        if (!isAPIRequestSuccessful(res)) {
-            callbackFalse();
-        }
-
-        // else
-        else {
-            callbackTrue();
-        }
-    });
-}
-
-
-
-
 // a function that returns true if request response is successful
-function isAPIRequestSuccessful(res) {
+export function isAPIRequestSuccessful(res) {
     // 1 indicates success
     if (res.status === NUM.SUCCESS) {
         // success
@@ -258,18 +232,38 @@ function isAPIRequestSuccessful(res) {
 
 
 
+
+
+
+// functions the require to have a callback lol
+// aa abstraction
+
+// asks the server to validate the credentials
+export function serverValidateCredentials(callback = ()=>{}) {
+    // get the credentials
+    let credentials = getCredentials();
+
+    // check if credentials are good
+    if (clientErrorWall(callback, credentials === NUM.FAILED, "ERROR")) { return; }
+
+    // login, or in other words, ask the server for help to validate the credentials
+    login(credentials.username, credentials.password, res => {
+        callback(res);
+    });
+}
+
 // login function
 function login(username, password, callback = ()=>{}) {
     // check username string if it is valid
-    if (clientErrorWall(!usernameStringValidityWall(username), "ERROR")) { return; }
+    if (clientErrorWall(callback, !usernameStringValidityWall(username), "ERROR")) { return; }
     // check password string if it is valid
-    if (clientErrorWall(!passwordStringValidityWall(password), "ERROR")) { return; }
+    if (clientErrorWall(callback, !passwordStringValidityWall(password), "ERROR")) { return; }
 
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
 
     // if fetch body fails
-    if (clientErrorWall(fetchBody === NUM.FAILED, "ERROR")) { return; } 
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; } 
 
     // fetch /api/login, with the necessary information
     fetch("/api/login", fetchBody)
@@ -278,7 +272,7 @@ function login(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(!isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
 
         // callback with the response
         callback(response);
@@ -288,15 +282,15 @@ function login(username, password, callback = ()=>{}) {
 // signup function
 function signup(username, password, callback = ()=>{}) {
     // check username string if it is valid
-    if (clientErrorWall(!usernameStringValidityWall(username), "ERROR")) { return; }
+    if (clientErrorWall(callback, !usernameStringValidityWall(username), "ERROR")) { return; }
     // check password string if it is valid
-    if (clientErrorWall(!passwordStringValidityWall(password), "ERROR")) { return; }
+    if (clientErrorWall(callback, !passwordStringValidityWall(password), "ERROR")) { return; }
 
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
 
     // if fetch body fails
-    if (clientErrorWall(fetchBody === NUM.FAILED, "ERROR")) { return; } 
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; } 
 
     // fetch /api/createuser, with the necessary information
     fetch("/api/createuser", fetchBody)
@@ -305,7 +299,7 @@ function signup(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(!isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
 
         // callback with the response
         callback(response);
@@ -313,13 +307,13 @@ function signup(username, password, callback = ()=>{}) {
 }
 
 // get posts function
-export const getPosts = function() {
+export function getPosts(callback = ()=>{}) {
 
     // get the fetch body
     let fetchBody = getFetchBody(false);
 
     // if fetch body fails
-    if (clientErrorWall(fetchBody === NUM.FAILED, "ERROR")) { return; }
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
 
     // fetch /api/login, with the necessary information
     fetch("/api/getposts", fetchBody)
@@ -328,10 +322,10 @@ export const getPosts = function() {
     // render the content
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(!isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
 
         // callback with the response
-        renderContent(response.data);
+        callback(response.data);
     });
 }
 
@@ -349,6 +343,11 @@ function loginHandler(e, username, password) {
     
     // try to login
     login(username, password, res => {
+        // check if response is bad
+        if (res.status && res.status === NUM.FAILED) {
+            return;
+        }
+
         // save credentials
         saveCredentials(username, password);
 
@@ -364,6 +363,11 @@ function signupHandler(e, username, password) {
 
     // try to login
     signup(username, password, res => {
+        // check if response is bad
+        if (res.status && res.status === NUM.FAILED) {
+            return;
+        }
+
         // save credentials
         saveCredentials(username, password);
 
