@@ -8,6 +8,9 @@
 body {
     background-color: var(--theme-color-main);
     color: var(--theme-color-secondary);
+
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -17,6 +20,29 @@ body {
 
 
 
+.nav {
+    background-color: var(--theme-color-tertiary);
+    padding: 0.5em;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-button {
+    background-color: var(--theme-color-secondary);
+    color: var(--theme-color-main);
+    font-size: 1em;
+    padding: 1.25em 1em;
+    border: 0;
+}
+
+.nav-button:hover {
+    background-color: var(--theme-color-main);
+    color: var(--theme-color-secondary);
+}
+
+.nav-button-righty {
+    margin-left: auto;
+}
 
 
 

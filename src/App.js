@@ -8,11 +8,12 @@ function convertDateToLocalDate(date) {
 }
 
 // a function that return the "data" needed to "make" a nav button
-function createNavButton(name, onclick = () => {}) {
+function createNavButton(name, onclick = () => {}, isRighty = false) {
     // ye
     return {
         name: name,
-        onclick: onclick
+        onclick: onclick,
+        isRighty: isRighty
     }
 }
 
@@ -43,6 +44,14 @@ export const NavButton = function(props) {
     // the data
     let data = props.data;
 
+    // if "righty"
+    if (data.isRighty === true) {
+        // return a "different" button
+        return (
+            <button className="nav-button nav-button-righty" onClick={data.onClick}>{data.name}</button>
+        )
+    }
+
     // the nav button
     return (
         <button className="nav-button" onClick={data.onclick}>{data.name}</button>
@@ -54,7 +63,7 @@ export const Navbar = function() {
     // the Navbar component
     return (
         <nav className="nav">
-            <NavButton data={createNavButton("Log out", logout)} />
+            <NavButton data={createNavButton("Log out", logout, true)} />
         </nav>
     );
 }
