@@ -374,16 +374,16 @@ export function createPost(title, content, callback = ()=>{}) {
     if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
 
     // edit fetchBody's body, to add the title and content
-    let fetchBodyObject = JSON.parse(fetchBody);
+    fetchBody.body = JSON.parse(fetchBody.body);
 
     // add this to fetchBody's body
-    fetchBodyObject.body.post = {
+    fetchBody.body.post = {
         title: title,
         content: content
     }
 
     // then stringify fetchBody's body
-    fetchBody = JSON.stringify(fetchBodyObject);
+    fetchBody.body = JSON.stringify(fetchBody.body);
 
     // is fetchBody a living thing?
 

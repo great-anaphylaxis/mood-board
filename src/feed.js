@@ -83,6 +83,7 @@ export const Navbar = function() {
     // the Navbar component
     return (
         <nav className="nav">
+            <NavButton data={createNavButton("Create Post", () => { redirect('/createpost') })} />
             <NavButton data={createNavButton("Log out", logout, true)} />
         </nav>
     );
