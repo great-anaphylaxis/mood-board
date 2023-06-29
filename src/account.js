@@ -336,6 +336,16 @@ export function getPosts(callback = ()=>{}) {
     });
 }
 
+// create a new post
+function createPost(title, content, callback = ()=>{}) {
+    
+    // get the fetch body
+    let fetchBody = getFetchBody(false);
+
+    // if fetch body fails
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
+}
+
 // haha no callback
 
 // logout haha

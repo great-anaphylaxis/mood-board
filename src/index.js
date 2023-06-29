@@ -90,7 +90,7 @@ window.addEventListener('load', () => {
                 // get posts
                 getPosts(res => {
                     // render the post ssssssss
-                    renderContent(false, res);
+                    renderContent(res);
                 });
             }
 

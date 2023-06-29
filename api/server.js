@@ -13,6 +13,12 @@ const bcrypt = require('bcrypt');
 // le essentiales variables
 // express server (or app)
 const app = express();
+// body parser (i mean, yeah)
+const bodyParser = require('body-parser');
+
+// avoid limit error- maybe ?
+app.use(bodyParser.json({ limit: '50mb' }));
+
 // use this thing for json
 app.use(express.json());
 // the port
@@ -33,8 +39,15 @@ const pool = new pg.Pool({
 const NUM = {
     MIN_USERNAME_LENGTH: 3,
     MAX_USERNAME_LENGTH: 20,
+
     MIN_PASSWORD_LENGTH: 5,
     MAX_PASSWORD_LENGTH: 32,
+
+    MIN_POSTTITLE_LENGTH: 3,
+    MAX_POSTTITLE_LENGTH: 64,
+
+    MIN_POSTCONTENT_LENGTH: 3,
+    MAX_POSTCONTENT_LENGTH: 10000,
 
     FAILED: -1,
     SUCCESS: 1
@@ -58,6 +71,9 @@ const ERROR_MESSAGE = {
 
     NO_POST_INFORMATION: "No post information available",
     INCOMPLETE_POST: "Post information is incomplete",
+
+    INVALID_POSTTITLE: "Invalid post title, length not allowed or contains invalid characters",
+    INVALID_POSTCONTENT: "Invalid post content, length not allowed or contains invalid characters",
 
     INVALID_CREDENTIALS: "Invalid credentials, please log in again",
 };
@@ -224,6 +240,32 @@ function passwordStringValidityWall(password) {
 
     // string is valid
     return true;
+}
+
+// a function which validates the post title string if it is valid
+function postTitleStringValidityWall(title) {
+    // check if title length is good
+    if (title.length <= NUM.MAX_POSTTITLE_LENGTH && title.length >= NUM.MIN_POSTTITLE_LENGTH) {
+        return true;
+    }
+
+    // else
+    else {
+        return false;
+    } 
+}
+
+// a function which validates the post content string if it is valid
+function postContentStringValidityWall(content) {
+    // check if content length is good
+    if (content.length <= NUM.MAX_POSTCONTENT_LENGTH && content.length >= NUM.MIN_POSTCONTENT_LENGTH) {
+        return true;
+    }
+
+    // else
+    else {
+        return false;
+    } 
 }
 
 // a function that queries the database, ez
@@ -479,7 +521,10 @@ app.post('/api/createpost', (req, res) => {
     // if post title or post content is empty, then send error
     if (clientRequestErrorWall(res, !postTitle || !postContent, 400, ERROR_MESSAGE.INCOMPLETE_POST)) { return; }
 
-    
+    // check if post title is valid
+    if (clientRequestErrorWall(res, !postTitleStringValidityWall(postTitle), 400, ERROR_MESSAGE.INVALID_POSTTITLE)) { return; }
+    // check if post content is valid
+    if (clientRequestErrorWall(res, !postContentStringValidityWall(postContent), 400, ERROR_MESSAGE.INVALID_POSTCONTENT)) { return; }
 
     // check if username and password are correct and valid
     // this is to prevent "malicious" posting of something
