@@ -34,32 +34,46 @@ const NUM = {
     MIN_USERNAME_LENGTH: 3,
     MAX_USERNAME_LENGTH: 20,
     MIN_PASSWORD_LENGTH: 5,
-    MAX_PASSWORD_LENGTH: 32
+    MAX_PASSWORD_LENGTH: 32,
+
+    FAILED: -1,
+    SUCCESS: 1
 };
 
 // messages
 // error messages
 const ERROR_MESSAGE = {
     UNKNOWN: "Something unknown happened",
+
     USERNAME_DOES_NOT_EXIST: "Username does not exist",
+    INVALID_USERNAME: "Invalid username, length not allowed or contains invalid characters",
+    USERNAME_ALREADY_EXISTS: "Username already exists",
+
+    INVALID_PASSWORD: "Invalid password, length not allowed or contains invalid characters",
+
     EMPTY_BODY: "Body is empty",
     INCOMPLETE_BODY: "Body is incomplete",
-    USERNAME_ALREADY_EXISTS: "Username already exists",
+    
     LOGIN_FAILED: "Login failed: username and password do not match",
+
     NO_POST_INFORMATION: "No post information available",
     INCOMPLETE_POST: "Post information is incomplete",
+
     INVALID_CREDENTIALS: "Invalid credentials, please log in again",
-    INVALID_USERNAME: "Invalid username, length not allowed or contains invalid characters",
-    INVALID_PASSWORD: "Invalid password, length not allowed or contains invalid characters"
 };
 
 // success messages
 const SUCCESS_MESSAGE = {
     DEFAULT: "Success",
+
     API_LANDING: "Welcome to moodboard's /api",
+
     USER_CREATED: "New user created",
+
     LOGIN_SUCCESS: "Login successful",
+
     POST_CREATED: "New post created",
+
     GETPOST_SUCCESS: "Got posts successfully",
 };
 
@@ -74,7 +88,7 @@ function clientRequestErrorWall(res, bool, code = 400, message = ERROR_MESSAGE.U
     // if bool is true (a condition probably)
     if (bool == true) {
         // send the message, with a code, as a response to the request
-        res.status(code).send(responseReadyMessage(message, -1));
+        res.status(code).send(responseReadyMessage(message, NUM.FAILED));
 
         // return true
         return true;
@@ -111,7 +125,7 @@ function serverErrorWall(err, message = "Bro got an error!") {
 // like the clientRequestErrorWall, but the exact opposite
 function clientRequestSuccessWall(res, code = 200, message = SUCCESS_MESSAGE.DEFAULT) {
     // respond to request
-    res.status(code).send(responseReadyMessage(message, 1));
+    res.status(code).send(responseReadyMessage(message, NUM.SUCCESS));
 }
 
 // a function that return a response to a request

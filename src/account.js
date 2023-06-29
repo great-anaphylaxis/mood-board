@@ -215,6 +215,11 @@ function getCredentials() {
     return credentials;
 }
 
+// remove credentials hgehehehehehhe
+function removeCredentials() {
+    localStorage.removeItem("credentials");
+}
+
 // a function that returns true if request response is successful
 export function isAPIRequestSuccessful(res) {
     // 1 indicates success
@@ -234,9 +239,9 @@ export function isAPIRequestSuccessful(res) {
 
 
 
-
+// the goood functions- i mean "essential"
 // functions the require to have a callback lol
-// aa abstraction
+// aaaaaaa abstraction
 
 // asks the server to validate the credentials
 export function serverValidateCredentials(callback = ()=>{}) {
@@ -262,8 +267,8 @@ function login(username, password, callback = ()=>{}) {
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
 
-    // if fetch body fails
-    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; } 
+
+
 
     // fetch /api/login, with the necessary information
     fetch("/api/login", fetchBody)
@@ -288,9 +293,9 @@ function signup(username, password, callback = ()=>{}) {
 
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
+    
 
-    // if fetch body fails
-    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; } 
+
 
     // fetch /api/createuser, with the necessary information
     fetch("/api/createuser", fetchBody)
@@ -315,6 +320,8 @@ export function getPosts(callback = ()=>{}) {
     // if fetch body fails
     if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
 
+
+
     // fetch /api/login, with the necessary information
     fetch("/api/getposts", fetchBody)
     // then convert response to json
@@ -327,6 +334,17 @@ export function getPosts(callback = ()=>{}) {
         // callback with the response
         callback(response.data);
     });
+}
+
+// haha no callback
+
+// logout haha
+export function logout() {
+    // remove credentials
+    removeCredentials();
+
+    // redirect
+    redirect('/login');
 }
 
 

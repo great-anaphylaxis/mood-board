@@ -1,7 +1,19 @@
+// ye
+import { logout } from "./account";
+
 // yeah, exactly what the function says
 function convertDateToLocalDate(date) {
     // yeah
     return new Date(date).toLocaleString("en-US", {timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone});
+}
+
+// a function that return the "data" needed to "make" a nav button
+function createNavButton(name, onclick = () => {}) {
+    // ye
+    return {
+        name: name,
+        onclick: onclick
+    }
 }
 
 
@@ -27,11 +39,23 @@ export const Post = function(props) {
     );
 };
 
+export const NavButton = function(props) {
+    // the data
+    let data = props.data;
+
+    // the nav button
+    return (
+        <button className="nav-button" onClick={data.onclick}>{data.name}</button>
+    );
+}
+
 // Navbar Component
 export const Navbar = function() {
     // the Navbar component
     return (
-        <nav></nav>
+        <nav className="nav">
+            <NavButton data={createNavButton("Log out", logout)} />
+        </nav>
     );
 }
 

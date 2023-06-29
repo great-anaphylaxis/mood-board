@@ -74,7 +74,7 @@ window.addEventListener('load', () => {
             // if it is good
             if (isAPIRequestSuccessful(res)) {
                 // get posts
-                getPosts(res => {console.log(res)
+                getPosts(res => {
                     // render the post ssssssss
                     renderContent(res);
                 });
