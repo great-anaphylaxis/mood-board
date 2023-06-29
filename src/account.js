@@ -1,8 +1,6 @@
 import { NUM } from ".";
 
 
-// BUG! callback sucks
-
 // client side walls
 // a function which validates the username string if it is valid
 function usernameStringValidityWall(username) {
@@ -89,6 +87,32 @@ function passwordStringValidityWall(password) {
 
     // string is valid
     return true;
+}
+
+// a function which validates the post title string if it is valid
+function postTitleStringValidityWall(title) {
+    // check if title length is good
+    if (title.length <= NUM.MAX_POSTTITLE_LENGTH && title.length >= NUM.MIN_POSTTITLE_LENGTH) {
+        return true;
+    }
+
+    // else
+    else {
+        return false;
+    } 
+}
+
+// a function which validates the post content string if it is valid
+function postContentStringValidityWall(content) {
+    // check if content length is good
+    if (content.length <= NUM.MAX_POSTCONTENT_LENGTH && content.length >= NUM.MIN_POSTCONTENT_LENGTH) {
+        return true;
+    }
+
+    // else
+    else {
+        return false;
+    } 
 }
 
 
@@ -337,13 +361,44 @@ export function getPosts(callback = ()=>{}) {
 }
 
 // create a new post
-function createPost(title, content, callback = ()=>{}) {
+export function createPost(title, content, callback = ()=>{}) {
+    // check post title string if it is valid
+    if (clientErrorWall(callback, !postTitleStringValidityWall(title), "ERROR")) { return; }
+    // check post content string if it is valid
+    if (clientErrorWall(callback, !postContentStringValidityWall(content), "ERROR")) { return; }
     
     // get the fetch body
     let fetchBody = getFetchBody(false);
 
     // if fetch body fails
     if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
+
+    // edit fetchBody's body, to add the title and content
+    let fetchBodyObject = JSON.parse(fetchBody);
+
+    // add this to fetchBody's body
+    fetchBodyObject.body.post = {
+        title: title,
+        content: content
+    }
+
+    // then stringify fetchBody's body
+    fetchBody = JSON.stringify(fetchBodyObject);
+
+    // is fetchBody a living thing?
+
+    // fetchhhhhh
+    fetch("/api/createpost", fetchBody)
+    // then convert response to json
+    .then(response => response.json())
+
+    .then(response => {
+        // if unsuccessful, return
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
+
+        // callback with the response
+        callback(response);
+    });
 }
 
 // haha no callback

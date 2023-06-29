@@ -1,5 +1,7 @@
 // ye
-import { logout } from "./account";
+import { NUM } from ".";
+import { logout, createPost, redirect } from "./account";
+
 
 // yeah, exactly what the function says
 function convertDateToLocalDate(date) {
@@ -19,6 +21,25 @@ function createNavButton(name, onclick = () => {}, isRighty = false) {
 
 
 
+
+
+
+
+// "handlers"
+function createPostHandler(e, title, content) {
+    // nope bruh
+    e.preventDefault();
+
+    createPost(title, content, res => {
+        // check if response is bad
+        if (res.status && res.status === NUM.FAILED) {
+            return;
+        }
+
+        // return to feed
+        redirect('/');
+    });
+}
 
 
 // stuff, I guess you call it components
@@ -47,7 +68,7 @@ export const NavButton = function(props) {
     if (data.isRighty === true) {
         // return a "different" button
         return (
-            <button className="nav-button nav-button-righty" onClick={data.onClick}>{data.name}</button>
+            <button className="nav-button nav-button-righty" onClick={data.onclick}>{data.name}</button>
         )
     }
 
@@ -79,15 +100,20 @@ export const Content = function() {
 
 // CreatePost component, where you create posts
 export const CreatePost = function() {
+
+    // pretty self explanatory right?
+    let title = "";
+    let content = "";
+    
     // le componente
     return (
         <>
             <h1>Create Post</h1>
-            <form id="form">
+            <form id="form" onSubmit={e => createPostHandler(e, title, content)}>
                 <label htmlFor="title">Title</label>
-                <input type="text" name="title" id="title"></input>
+                <input type="text" name="title" id="title" onChange={e => title = e.target.value}></input>
                 <label htmlFor="content">Content</label>
-                <textarea name="content" id="content" form="form"></textarea>
+                <textarea name="content" id="content" form="form" onChange={e => content = e.target.value}></textarea>
                 <input type="submit" value="Submit"></input>
             </form>
         </>
