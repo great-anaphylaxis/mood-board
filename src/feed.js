@@ -22,7 +22,6 @@ function createNavButton(name, onclick = () => {}, isRighty = false) {
 
 
 // stuff, I guess you call it components
-
 // Post Component
 export const Post = function(props) {
     // the data variable
@@ -68,7 +67,7 @@ export const Navbar = function() {
     );
 }
 
-// Content Component, where you put the posts
+// Content Component, where you put the posts, or something else
 export const Content = function() {
     // the Content component
     return (
@@ -77,3 +76,20 @@ export const Content = function() {
         </div>
     );
 };
+
+// CreatePost component, where you create posts
+export const CreatePost = function() {
+    // le componente
+    return (
+        <>
+            <h1>Create Post</h1>
+            <form id="form">
+                <label htmlFor="title">Title</label>
+                <input type="text" name="title" id="title"></input>
+                <label htmlFor="content">Content</label>
+                <textarea name="content" id="content" form="form"></textarea>
+                <input type="submit" value="Submit"></input>
+            </form>
+        </>
+    );
+}

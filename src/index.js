@@ -2,7 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './App.css';
-import { Navbar, Content, Post } from './App';
+import { Navbar, Content, Post, CreatePost } from './feed';
 import { servePageAccordingly, addPage } from './singlepage';
 import { LoginForm, SignupForm, redirect, getPosts, serverValidateCredentials, isAPIRequestSuccessful } from './account';
 
@@ -22,7 +22,8 @@ export const NUM = {
 
 // pages
 addPage('/', <>
-    <Navbar /><Content />
+    <Navbar />
+    <Content />
 </>);
 
 addPage('/login', <>
@@ -31,6 +32,11 @@ addPage('/login', <>
 
 addPage('/signup', <>
     <SignupForm />
+</>);
+
+addPage('/createpost', <>
+    <Navbar />
+    <CreatePost />
 </>);
 
 
@@ -58,13 +64,21 @@ export const renderContent = (content) => {
         return;
     }
 
-    // yeah it renders it
+    // put emmm
     ReactDOM.createRoot(document.getElementById('content')).render(
         <React.StrictMode>
             {content.map((post, i) => <Post key={i} data={post} />)}
         </React.StrictMode>
     );
 };
+
+
+
+
+
+
+
+
 
 // on load window
 window.addEventListener('load', () => {
@@ -76,7 +90,7 @@ window.addEventListener('load', () => {
                 // get posts
                 getPosts(res => {
                     // render the post ssssssss
-                    renderContent(res);
+                    renderContent(false, res);
                 });
             }
 
