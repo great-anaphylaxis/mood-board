@@ -472,7 +472,7 @@ app.post('/api/getposts', (req, res) => {
         if (isValid == true) {
             
             // query ALL the posts, without any algorithm whatsoever
-            query("select * from public.posts", undefined, DBRes => {
+            query("select * from public.posts order by id desc", undefined, DBRes => {
                 // send ALL the posts :D
                 res.status(200).send(JSON.stringify({
                     status: 1,
