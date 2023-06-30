@@ -272,7 +272,14 @@ export function serverValidateCredentials(callback = ()=>{}) {
     let credentials = getCredentials();
 
     // check if credentials are good
-    if (clientErrorWall(callback, credentials === NUM.FAILED, ERROR_MESSAGE.INVALID_CREDENTIALS)) { return; }
+    if (credentials === NUM.FAILED) {
+        // if they are bad, then kill the function
+        callback({
+            status: NUM.FAILED,
+            message: ERROR_MESSAGE.UNKNOWN
+        });
+        return;
+    }
 
     // login, or in other words, ask the server for help to validate the credentials
     login(credentials.username, credentials.password, res => {
