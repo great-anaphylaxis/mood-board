@@ -6,7 +6,6 @@ import { Navbar, Content, Post, CreatePost } from './feed';
 import { servePageAccordingly, addPage } from './singlepage';
 import { LoginForm, SignupForm, redirect, getPosts, serverValidateCredentials, isAPIRequestSuccessful } from './account';
 
-
 // numbers
 export const NUM = {
     FAILED: -1,
@@ -23,6 +22,29 @@ export const NUM = {
 
     MIN_POSTCONTENT_LENGTH: 3,
     MAX_POSTCONTENT_LENGTH: 10000,
+};
+
+// error messages
+export const ERROR_MESSAGE = {
+    UNKNOWN: "Something unknown happened!",
+
+    INVALID_CREDENTIALS: "Invalid credentials",
+
+    INVALID_USERNAME: "Invalid username",
+
+    INVALID_PASSWORD: "Invalid password",
+
+    INVALID_POSTTITLE: "Invalid post title",
+
+    INVALID_POSTCONTENT: "Invalid post content",
+
+    LOGIN_FAILED: "Login failed",
+
+    SIGNUP_FAILED: "Signup failed",
+
+    GETPOSTS_FAILED: "Getting posts failed",
+
+    CREATEPOST_FAILED: "Create post failed",
 };
 
 

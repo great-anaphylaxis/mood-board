@@ -1,4 +1,4 @@
-import { NUM } from ".";
+import { ERROR_MESSAGE, NUM } from ".";
 
 
 // client side walls
@@ -128,7 +128,7 @@ function logger(message) {
 }
 
 // a wall to prevent an error from continuing
-function clientErrorWall(callback, bool, message = "ERROR!") {
+function clientErrorWall(callback, bool, message = ERROR_MESSAGE.UNKNOWN) {
     // if bool (probably a condition) is true
     if (bool === true) {
         // "callback" the message
@@ -273,7 +273,7 @@ export function serverValidateCredentials(callback = ()=>{}) {
     let credentials = getCredentials();
 
     // check if credentials are good
-    if (clientErrorWall(callback, credentials === NUM.FAILED, "ERROR")) { return; }
+    if (clientErrorWall(callback, credentials === NUM.FAILED, ERROR_MESSAGE.INVALID_CREDENTIALS)) { return; }
 
     // login, or in other words, ask the server for help to validate the credentials
     login(credentials.username, credentials.password, res => {
@@ -284,9 +284,9 @@ export function serverValidateCredentials(callback = ()=>{}) {
 // login function
 function login(username, password, callback = ()=>{}) {
     // check username string if it is valid
-    if (clientErrorWall(callback, !usernameStringValidityWall(username), "ERROR")) { return; }
+    if (clientErrorWall(callback, !usernameStringValidityWall(username), ERROR_MESSAGE.INVALID_USERNAME)) { return; }
     // check password string if it is valid
-    if (clientErrorWall(callback, !passwordStringValidityWall(password), "ERROR")) { return; }
+    if (clientErrorWall(callback, !passwordStringValidityWall(password), ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
 
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
@@ -301,7 +301,7 @@ function login(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.LOGIN_FAILED)) { return; }
 
         // callback with the response
         callback(response);
@@ -311,9 +311,9 @@ function login(username, password, callback = ()=>{}) {
 // signup function
 function signup(username, password, callback = ()=>{}) {
     // check username string if it is valid
-    if (clientErrorWall(callback, !usernameStringValidityWall(username), "ERROR")) { return; }
+    if (clientErrorWall(callback, !usernameStringValidityWall(username), ERROR_MESSAGE.INVALID_USERNAME)) { return; }
     // check password string if it is valid
-    if (clientErrorWall(callback, !passwordStringValidityWall(password), "ERROR")) { return; }
+    if (clientErrorWall(callback, !passwordStringValidityWall(password), ERROR_MESSAGE.INVALID_PASSWORD)) { return; }
 
     // get the fetch body
     let fetchBody = getFetchBody(true, {username: username, password: password});
@@ -328,7 +328,7 @@ function signup(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.SIGNUP_FAILED)) { return; }
 
         // callback with the response
         callback(response);
@@ -342,7 +342,7 @@ export function getPosts(callback = ()=>{}) {
     let fetchBody = getFetchBody(false);
 
     // if fetch body fails
-    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, ERROR_MESSAGE.INVALID_CREDENTIALS)) { return; }
 
 
 
@@ -353,7 +353,7 @@ export function getPosts(callback = ()=>{}) {
     // render the content
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.GETPOSTS_FAILED)) { return; }
 
         // callback with the response
         callback(response.data);
@@ -363,15 +363,15 @@ export function getPosts(callback = ()=>{}) {
 // create a new post
 export function createPost(title, content, callback = ()=>{}) {
     // check post title string if it is valid
-    if (clientErrorWall(callback, !postTitleStringValidityWall(title), "ERROR")) { return; }
+    if (clientErrorWall(callback, !postTitleStringValidityWall(title), ERROR_MESSAGE.INVALID_POSTTITLE)) { return; }
     // check post content string if it is valid
-    if (clientErrorWall(callback, !postContentStringValidityWall(content), "ERROR")) { return; }
+    if (clientErrorWall(callback, !postContentStringValidityWall(content), ERROR_MESSAGE.INVALID_POSTCONTENT)) { return; }
     
     // get the fetch body
     let fetchBody = getFetchBody(false);
 
     // if fetch body fails
-    if (clientErrorWall(callback, fetchBody === NUM.FAILED, "ERROR")) { return; }
+    if (clientErrorWall(callback, fetchBody === NUM.FAILED, ERROR_MESSAGE.INVALID_CREDENTIALS)) { return; }
 
     // edit fetchBody's body, to add the title and content
     fetchBody.body = JSON.parse(fetchBody.body);
@@ -394,7 +394,7 @@ export function createPost(title, content, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), "ERROR")) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.CREATEPOST_FAILED)) { return; }
 
         // callback with the response
         callback(response);
