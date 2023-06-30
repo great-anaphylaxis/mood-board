@@ -301,7 +301,7 @@ function login(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.LOGIN_FAILED)) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.LOGIN_FAILED + ": " + response.message)) { return; }
 
         // callback with the response
         callback(response);
@@ -328,7 +328,7 @@ function signup(username, password, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.SIGNUP_FAILED)) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.SIGNUP_FAILED + ": " + response.message)) { return; }
 
         // callback with the response
         callback(response);
@@ -353,7 +353,7 @@ export function getPosts(callback = ()=>{}) {
     // render the content
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.GETPOSTS_FAILED)) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.GETPOSTS_FAILED + ": " + response.message)) { return; }
 
         // callback with the response
         callback(response.data);
@@ -394,7 +394,7 @@ export function createPost(title, content, callback = ()=>{}) {
 
     .then(response => {
         // if unsuccessful, return
-        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.CREATEPOST_FAILED)) { return; }
+        if (clientErrorWall(callback, !isAPIRequestSuccessful(response), ERROR_MESSAGE.CREATEPOST_FAILED + ": " + response.message)) { return; }
 
         // callback with the response
         callback(response);

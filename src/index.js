@@ -28,15 +28,15 @@ export const NUM = {
 export const ERROR_MESSAGE = {
     UNKNOWN: "Something unknown happened!",
 
-    INVALID_CREDENTIALS: "Invalid credentials",
+    INVALID_CREDENTIALS: "Invalid credentials, please log in again",
 
-    INVALID_USERNAME: "Invalid username",
+    INVALID_USERNAME: "Invalid username, length not allowed or contains invalid characters",
 
-    INVALID_PASSWORD: "Invalid password",
+    INVALID_PASSWORD: "Invalid password, length not allowed or contains invalid characters",
 
-    INVALID_POSTTITLE: "Invalid post title",
+    INVALID_POSTTITLE: "Invalid post title, length not allowed or contains invalid characters",
 
-    INVALID_POSTCONTENT: "Invalid post content",
+    INVALID_POSTCONTENT: "Invalid post content, length not allowed or contains invalid characters",
 
     LOGIN_FAILED: "Login failed",
 

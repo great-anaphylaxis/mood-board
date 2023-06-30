@@ -67,7 +67,7 @@ const ERROR_MESSAGE = {
     EMPTY_BODY: "Body is empty",
     INCOMPLETE_BODY: "Body is incomplete",
     
-    LOGIN_FAILED: "Login failed: username and password do not match",
+    LOGIN_FAILED: "Username and password do not match",
 
     NO_POST_INFORMATION: "No post information available",
     INCOMPLETE_POST: "Post information is incomplete",
