@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ERROR_MESSAGE, NUM } from ".";
 
 
@@ -475,6 +476,9 @@ export const LoginForm = function() {
     // username and password variables
     let username = "";
     let password = "";
+
+    // state if password is shown
+    let [showPassword, setShowPassword] = useState("password");
     
     // the components encompassing the login component
     return (
@@ -484,7 +488,16 @@ export const LoginForm = function() {
             <label htmlFor="username">Username</label>
             <input type="text" name="username" id="username" autoComplete="on" onChange={e => username = e.target.value}></input>
             <label htmlFor="password">Password</label>
-            <input type="password" name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
+            <input type={showPassword} name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
+            <label htmlFor="showPassword">Show Password</label>
+            <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
+                if (e.target.checked === true) { // if checkbox is checked
+                    setShowPassword("text"); // show password
+                }
+                else if (e.target.checked === false) { // else
+                    setShowPassword("password"); // hide password
+                }
+            }}></input>
             <input type="submit" value="Submit"></input>
         </form>
         </>
@@ -496,6 +509,9 @@ export const SignupForm = function() {
     // username and password variables
     let username = "";
     let password = "";
+
+    // state if password is shown
+    let [showPassword, setShowPassword] = useState("password");
     
     // the components encompassing the login component
     return (
@@ -505,7 +521,16 @@ export const SignupForm = function() {
             <label htmlFor="username">Username</label>
             <input type="text" name="username" id="username" autoComplete="on" onChange={e => username = e.target.value}></input>
             <label htmlFor="password">Password</label>
-            <input type="password" name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
+            <input type={showPassword} name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
+            <label htmlFor="showPassword">Show Password</label>
+            <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
+                if (e.target.checked === true) { // if checkbox is checked
+                    setShowPassword("text"); // show password
+                }
+                else if (e.target.checked === false) { // else
+                    setShowPassword("password"); // hide password
+                }
+            }}></input>
             <input type="submit" value="Submit"></input>
         </form>
         </>
