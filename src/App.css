@@ -81,3 +81,72 @@ body {
 .content {
     margin: 0.5em 0;
 }
+
+
+
+
+
+
+.form {
+    border: 1px solid var(--theme-color-tertiary);
+    margin: 5em auto;
+    padding: 2em;
+    min-width: 40%;
+    max-width: 40%;
+}
+
+.form > label {
+    margin: auto;
+    font-size: 1.5em;
+}
+
+.formtitle {
+    display: block;
+    width: fit-content;
+    margin: auto;
+}
+
+#username {
+    display: block;
+    width: 100%;
+    margin: 0.25em 0em 2em 0em;
+}
+
+#password {
+    display: block;
+    width: 100%;
+    margin: 0.25em 0em 0.5em 0em;
+}
+
+#submit {
+    display: block;
+    margin: 2em auto 0em auto;
+    background-color: var(--theme-color-secondary);
+    color: var(--theme-color-main);
+    border: 1px solid rgba(255, 255, 255, 0);
+    border-radius: 10%;
+    font-size: 1em;
+    padding: 0.5em 2em;
+}
+
+#submit:hover {
+    cursor: pointer;
+    background-color: var(--theme-color-main);
+    color: var(--theme-color-secondary);
+    border: 1px solid var(--theme-color-tertiary);
+}
+
+.forgotpassword {
+    position: relative;
+    float: right;
+    color: var(--theme-color-secondary);
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.formhint {
+    display: block;
+    width: fit-content;
+    color: var(--theme-color-secondary);
+    margin: 2em auto 0em auto;
+}

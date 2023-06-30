@@ -483,22 +483,40 @@ export const LoginForm = function() {
     // the components encompassing the login component
     return (
         <>
-        <h1>Login</h1>
-        <form onSubmit={e => loginHandler(e, username, password)}>
+        <form onSubmit={e => loginHandler(e, username, password)} className="form">
+            <h1 className="formtitle">Login</h1>
+
+
             <label htmlFor="username">Username</label>
             <input type="text" name="username" id="username" autoComplete="on" onChange={e => username = e.target.value}></input>
             <label htmlFor="password">Password</label>
             <input type={showPassword} name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
-            <label htmlFor="showPassword">Show Password</label>
-            <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
-                if (e.target.checked === true) { // if checkbox is checked
-                    setShowPassword("text"); // show password
-                }
-                else if (e.target.checked === false) { // else
-                    setShowPassword("password"); // hide password
-                }
-            }}></input>
-            <input type="submit" value="Submit"></input>
+
+
+
+
+            <div className="formtool">
+                <label htmlFor="showPassword">Show Password</label>
+                <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
+                    if (e.target.checked === true) { // if checkbox is checked
+                        setShowPassword("text"); // show password
+                    }
+                    else if (e.target.checked === false) { // else
+                        setShowPassword("password"); // hide password
+                    }
+                }}></input>
+                <p className="forgotpassword" onClick={e => {
+                    e.preventDefault();
+
+                    alert("Relax... and try to remember it");
+                }}>Forgot Password?</p>
+            </div>
+
+
+
+            <input type="submit" value="Submit" id="submit"></input>
+
+            <a className="formhint" href="/signup">Don't have an account yet?</a>
         </form>
         </>
     );
@@ -516,23 +534,34 @@ export const SignupForm = function() {
     // the components encompassing the login component
     return (
         <>
-        <h1>Signup</h1>
-        <form onSubmit={e => signupHandler(e, username, password)}>
-            <label htmlFor="username">Username</label>
-            <input type="text" name="username" id="username" autoComplete="on" onChange={e => username = e.target.value}></input>
-            <label htmlFor="password">Password</label>
-            <input type={showPassword} name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
-            <label htmlFor="showPassword">Show Password</label>
-            <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
-                if (e.target.checked === true) { // if checkbox is checked
-                    setShowPassword("text"); // show password
-                }
-                else if (e.target.checked === false) { // else
-                    setShowPassword("password"); // hide password
-                }
-            }}></input>
-            <input type="submit" value="Submit"></input>
-        </form>
+            
+            <form onSubmit={e => signupHandler(e, username, password)} className="form">
+                <h1 className="formtitle">Signup</h1>
+
+                <label htmlFor="username">Username</label>
+                <input type="text" name="username" id="username" autoComplete="on" onChange={e => username = e.target.value}></input>
+                <label htmlFor="password">Password</label>
+                <input type={showPassword} name="password" id="password" autoComplete="on" onChange={e => password = e.target.value}></input>
+
+
+
+                <div className="formtool">
+                    <label htmlFor="showPassword">Show Password</label>
+                    <input type="checkbox" id="showPassword" name="showPassword" value="showPassword" onChange={e => {
+                        if (e.target.checked === true) { // if checkbox is checked
+                            setShowPassword("text"); // show password
+                        }
+                        else if (e.target.checked === false) { // else
+                            setShowPassword("password"); // hide password
+                        }
+                    }}></input>
+                </div>
+
+
+                <input type="submit" value="Submit" id="submit"></input>
+
+                <a className="formhint" href="/login">Already have an account?</a>
+            </form>
         </>
     );
 }
