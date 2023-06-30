@@ -38,6 +38,8 @@ export const ERROR_MESSAGE = {
 
     INVALID_POSTCONTENT: "Invalid post content, length not allowed or contains invalid characters",
 
+    FETCHING_FAILED: "Fetching failed, check your internet connection and try again",
+
     LOGIN_FAILED: "Login failed",
 
     SIGNUP_FAILED: "Signup failed",

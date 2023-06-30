@@ -154,8 +154,6 @@ function clientErrorWall(callback, bool, message = ERROR_MESSAGE.UNKNOWN) {
 
 
 
-
-
 // a function which returns an object that is used for fetching
 function getFetchBody(isGiven = false, givenObject) {
     // if there is no given object
@@ -305,7 +303,10 @@ function login(username, password, callback = ()=>{}) {
 
         // callback with the response
         callback(response);
-    });
+    })
+
+    // no intenet bruh, or I guess server is down
+    .catch(() => clientErrorWall(callback, true, ERROR_MESSAGE.FETCHING_FAILED));
 }
 
 // signup function
@@ -332,7 +333,10 @@ function signup(username, password, callback = ()=>{}) {
 
         // callback with the response
         callback(response);
-    });
+    })
+
+    // no intenet bruh, or I guess server is down
+    .catch(() => clientErrorWall(callback, true, ERROR_MESSAGE.FETCHING_FAILED));
 }
 
 // get posts function
@@ -357,7 +361,10 @@ export function getPosts(callback = ()=>{}) {
 
         // callback with the response
         callback(response.data);
-    });
+    })
+
+    // no intenet bruh, or I guess server is down
+    .catch(() => clientErrorWall(callback, true, ERROR_MESSAGE.FETCHING_FAILED));
 }
 
 // create a new post
@@ -398,7 +405,10 @@ export function createPost(title, content, callback = ()=>{}) {
 
         // callback with the response
         callback(response);
-    });
+    })
+
+    // no intenet bruh, or I guess server is down
+    .catch(() => clientErrorWall(callback, true, ERROR_MESSAGE.FETCHING_FAILED));
 }
 
 // haha no callback
